@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jurnal Tumbuh Kembang Anak</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{--bg:#fdf6ef;--card:#fffdf9;--ink:#4a3b32;--muted:#8a7a6e;--accent:#d98b5f;--accent2:#8fb8a0;--line:#eadfd3;--gold:#f2c46d}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;background:linear-gradient(180deg,#fdf6ef,#f5e9dc);color:var(--ink);min-height:100vh;line-height:1.5}
+.app{max-width:640px;margin:0 auto;padding:16px 14px 80px}
+h1{font-size:1.5rem;margin:.2rem 0 .4rem}
+h2{font-size:1.2rem;margin:.2rem 0 .6rem}
+h3{font-size:1rem;margin:.8rem 0 .4rem}
+.muted{color:var(--muted);font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 4px 14px rgba(120,80,50,.06)}
+.hero{text-align:center;padding:26px 18px;background:linear-gradient(135deg,#fff8f0,#f7ecdf)}
+.hero .sapa{font-size:1.35rem}
+.quote{font-style:italic;color:var(--muted);margin-top:10px}
+.memory{border-left:4px solid var(--gold)}
+.memory img{width:100%;border-radius:12px;margin:10px 0}
+input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink);margin:4px 0 10px}
+textarea{min-height:100px;resize:vertical}
+label{display:block;font-size:.92rem;color:var(--muted)}
+label.check{display:flex;align-items:center;gap:8px;color:var(--ink);margin:8px 0}
+label.check input{width:auto;margin:0}
+button{font:inherit;border:none;border-radius:12px;padding:11px 16px;cursor:pointer;min-height:44px}
+.primary{background:var(--accent);color:#fff;width:100%;margin-top:4px}
+.ghost{background:#f3e7da;color:var(--ink);margin:4px 4px 4px 0}
+.x{background:none;color:var(--muted);padding:2px 6px;min-height:auto;font-size:.85rem}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.childRow{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:center;margin-bottom:8px}
+.childRow .x{grid-column:span 2;justify-self:end}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kid{cursor:pointer;text-align:center}
+.kid:active{transform:scale(.98)}
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),#b9d7c4);color:#fff;font-size:1.6rem;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:10px 0 14px;padding-bottom:4px}
+.tab{background:#f3e7da;color:var(--ink);white-space:nowrap;padding:8px 14px;min-height:auto}
+.tab.on{background:var(--accent);color:#fff}
+.entry{border-bottom:1px dashed var(--line);padding:12px 0}
+.entry:last-child{border-bottom:none}
+.entry.letter{background:#fbf3e6;border-radius:14px;padding:14px;border:1px solid #efdcc4}
+.entry .meta{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted)}
+.entry p{white-space:pre-wrap;margin:6px 0}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin:8px 0}
+.pgrid img,.gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;cursor:pointer;background:#f3e7da}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.gallery .cap{font-size:.75rem;color:var(--muted);margin:2px 0 8px}
+#fotoPrev{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;margin:6px 0}
+#fotoPrev img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px}
+.mslot{background:#fffaf4;border:1px dashed var(--line);border-radius:12px;padding:8px;text-align:center}
+.mslot img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;cursor:pointer}
+.mhead{font-weight:bold;color:var(--accent);margin-bottom:6px}
+.mempty{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:10px;background:#f7efe6;cursor:pointer;font-size:.9rem;text-align:center;padding:6px}
+.mempty input{display:none}
+.group{margin-bottom:12px}
+.badge{display:inline-block;background:#e4f1e8;color:#3f7a57;border-radius:20px;padding:2px 10px;font-size:.78rem;margin-left:6px}
+.chart{width:100%;height:auto;background:#fffaf4;border-radius:12px;margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+.year{font-size:1.1rem;color:var(--accent);margin:18px 0 6px;border-bottom:1px solid var(--line)}
+.tl{font-size:.92rem;padding:6px 0 6px 12px;border-left:2px solid var(--line);margin-left:6px}
+.bar{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.back{background:none;color:var(--accent);padding:4px 0;min-height:auto}
+.drive{font-size:.92rem}
+.drive .ok{color:#3f7a57}
+.drive .wait{color:#a2762e}
+.lb{position:fixed;inset:0;background:rgba(30,20,15,.92);display:flex;align-items:center;justify-content:center;z-index:50}
+.lb img{max-width:96vw;max-height:80vh;border-radius:10px}
+.lb .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);color:#fff;font-size:1.6rem;padding:8px 14px}
+.lb .prev{left:8px}.lb .next{right:8px}
+.lb .close{position:absolute;top:10px;right:10px;transform:none;font-size:1.1rem}
+.lb .info{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#f7ecdf;font-size:.9rem;padding:0 16px}
+@media print{.noprint{display:none!important}body{background:#fff}.card{box-shadow:none}}
+@media (max-width:420px){.grid{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app" id="app"><p class="muted" style="text-align:center;margin-top:40px">Memuat...</p></div>
+<input type="file" accept="application/json" id="importFile" style="display:none">
+
+<script>
+const KEY='jurnal-tumbuh-kembang-v1';
+const DRIVE_KEY='jurnal-drive-v1';
+const DRIVE_ON_KEY='jurnal-drive-on';
+const DB_NAME='jurnal-anak';
+const STORE='foto';
+const MAX_PHOTOS=8;
+const CLIENT_ID='394889107563-j3cajoh1thpcffo1f3g7anv7g3f2oqqe.apps.googleusercontent.com';
+const DRIVE_SCOPE='https://www.googleapis.com/auth/drive.file';
+const FOLDER_NAME='Jurnal Anak';
+const QUOTES=[
+ 'Setiap hari bersama mereka adalah bab kecil yang tidak ingin kami lupakan.',
+ 'Tumbuhlah pelan-pelan, Nak. Kami akan selalu menjadi saksi langkahmu.',
+ 'Jejak kecil hari ini adalah kenangan besar di kemudian hari.',
+ 'Tidak ada yang lebih indah dari tawa mereka yang menyambut setiap pagi.',
+ 'Kelak mungkin mereka lupa apa yang kita ucapkan, tapi tidak akan lupa betapa kita mencintai mereka.',
+ 'Waktu berjalan cepat, maka simpanlah setiap momen yang bisa disimpan.'
+];
+const MILESTONES=[
+ {from:0,to:3,label:'0–3 bulan',items:['Mengangkat kepala saat tengkurap','Tersenyum saat diajak bicara','Mengikuti benda dengan matanya','Menoleh ke arah suara']},
+ {from:3,to:6,label:'3–6 bulan',items:['Tertawa keras','Berguling','Meraih mainan','Mengoceh (ba-ba, ma-ma)']},
+ {from:6,to:12,label:'6–12 bulan',items:['Duduk tanpa bantuan','Merangkak','Berdiri berpegangan','Mengucapkan kata pertama','Menunjuk benda']},
+ {from:12,to:24,label:'12–24 bulan',items:['Berjalan tanpa bantuan','Mengucapkan 5+ kata','Menyusun 2–3 balok','Menunjuk bagian tubuh']},
+ {from:24,to:36,label:'2–3 tahun',items:['Berlari','Naik tangga sambil berpegangan','Menyebut nama sendiri','Menggambar garis']},
+ {from:36,to:60,label:'3–5 tahun',items:['Melompat dengan dua kaki','Menyebut warna','Bercerita 3–4 kalimat','Memakai baju sendiri']}
+];
+
+/* ---------- UTILITAS ---------- */
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const pad=n=>String(n).padStart(2,'0');
+const toISO=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const birthDate=c=>new Date(c.birth+'T00:00:00');
+const fmtDate=s=>new Date(s+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+function monthsBetween(b,on){let m=(on.getFullYear()-b.getFullYear())*12+(on.getMonth()-b.getMonth());if(on.getDate()<b.getDate())m--;return m;}
+function ageMonths(c){return monthsBetween(birthDate(c),new Date());}
+function ageText(c){
+  const b=birthDate(c),now=new Date();
+  const m=monthsBetween(b,now);
+  if(m<0)return 'belum lahir';
+  if(m<1)return Math.floor((now-b)/86400000)+' hari';
+  const y=Math.floor(m/12),r=m%12;
+  return ((y?y+' tahun':'')+(y&&r?' ':'')+(r?r+' bulan':'')).trim();
+}
+function greet(){const h=new Date().getHours();return h<11?'Selamat pagi':h<15?'Selamat siang':h<18?'Selamat sore':'Selamat malam';}
+
+/* ---------- DATA: teks di localStorage, foto di IndexedDB ---------- */
+let S=emptyState();
+let DB=null;
+const PHOTO={};
+let DRIVE={folderId:null,files:{},pending:[]}; // files: id foto -> id file di Drive
+
+function emptyState(){return {parent:{ayah:'',ibu:''},role:'ibu',children:[],entries:[],milestones:{},growth:[],monthly:{}};}
+function normalize(s){
+  s=Object.assign(emptyState(),s);
+  s.entries=s.entries.map(e=>{
+    if(!e.photos)e.photos=e.photo?[e.photo]:[];
+    delete e.photo;return e;
+  });
+  return s;
+}
+function loadState(){
+  try{const d=JSON.parse(localStorage.getItem(KEY));return d?normalize(d):emptyState();}
+  catch(e){return emptyState();}
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S));}
+  catch(e){alert('Penyimpanan browser penuh. Unduh cadangan untuk berjaga-jaga.');}
+}
+function loadDrive(){
+  try{const d=JSON.parse(localStorage.getItem(DRIVE_KEY));if(d)DRIVE=Object.assign({folderId:null,files:{},pending:[]},d);}catch(e){}
+}
+function saveDrive(){localStorage.setItem(DRIVE_KEY,JSON.stringify(DRIVE));}
+
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded=()=>r.result.createObjectStore(STORE);
+    r.onsuccess=()=>res(r.result);
+    r.onerror=()=>rej(r.error);
+  });
+}
+function idbWrite(fn){
+  return new Promise((res,rej)=>{
+    const tx=DB.transaction(STORE,'readwrite');
+    fn(tx.objectStore(STORE));
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+function idbAll(){
+  return new Promise((res,rej)=>{
+    const out={};
+    const tx=DB.transaction(STORE,'readonly');
+    const req=tx.objectStore(STORE).openCursor();
+    req.onsuccess=()=>{const c=req.result;if(c){out[c.key]=c.value;c.continue();}};
+    tx.oncomplete=()=>res(out);
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+async function addPhoto(dataUrl){
+  const id='p'+uid();
+  PHOTO[id]=dataUrl;
+  await idbWrite(st=>st.put(dataUrl,id));
+  queueUpload(id);
+  return id;
+}
+async function removePhotos(ids){
+  ids=ids.filter(Boolean);
+  if(!ids.length)return;
+  ids.forEach(id=>{delete PHOTO[id];DRIVE.pending=DRIVE.pending.filter(x=>x!==id);});
+  saveDrive();
+  await idbWrite(st=>ids.forEach(id=>st.delete(id)));
+}
+const src=id=>PHOTO[id]||'';
+
+// Memindahkan foto lama (dataURL di localStorage) ke IndexedDB
+async function migrate(){
+  let changed=false;
+  for(const e of S.entries){
+    for(let i=0;i<e.photos.length;i++){
+      if(e.photos[i].startsWith('data:')){e.photos[i]=await addPhoto(e.photos[i]);changed=true;}
+    }
+  }
+  for(const cid in S.monthly){
+    for(const m in S.monthly[cid]){
+      const p=S.monthly[cid][m];
+      if(p.photo&&p.photo.startsWith('data:')){p.photo=await addPhoto(p.photo);changed=true;}
+    }
+  }
+  if(changed)save();
+}
+function allPhotoIds(){
+  const ids=[];
+  S.entries.forEach(e=>ids.push(...e.photos));
+  Object.values(S.monthly).forEach(bulan=>Object.values(bulan).forEach(p=>ids.push(p.photo)));
+  return ids;
+}
+
+/* ---------- GOOGLE DRIVE ---------- */
+let tokenClient=null,token=null,tokenExp=0,uploading=false;
+
+function waitGoogle(){
+  return new Promise(res=>{
+    const t=setInterval(()=>{if(window.google&&google.accounts&&google.accounts.oauth2){clearInterval(t);res(true);}},200);
+    setTimeout(()=>{clearInterval(t);res(false);},8000);
+  });
+}
+function initDriveClient(){
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID,
+    scope:DRIVE_SCOPE,
+    callback:resp=>{
+      if(resp.error){alert('Gagal terhubung ke Google Drive: '+resp.error);updateDriveBar();return;}
+      token=resp.access_token;
+      tokenExp=Date.now()+(resp.expires_in-60)*1000;
+      localStorage.setItem(DRIVE_ON_KEY,'1');
+      updateDriveBar();
+      processQueue();
+    },
+    error_callback:()=>{updateDriveBar();}
+  });
+}
+function connectDrive(){
+  if(!tokenClient)return alert('Layanan Google belum siap. Pastikan koneksi internet aktif lalu muat ulang halaman.');
+  tokenClient.requestAccessToken({prompt:localStorage.getItem(DRIVE_ON_KEY)?'':'consent'});
+}
+function silentConnect(){
+  if(!tokenClient||!localStorage.getItem(DRIVE_ON_KEY))return;
+  try{tokenClient.requestAccessToken({prompt:'none'});}catch(e){}
+}
+function driveConnected(){return !!token&&Date.now()<tokenExp;}
+
+async function apiFetch(url,opts={}){
+  if(!driveConnected())throw new Error('TOKEN');
+  const r=await fetch(url,{...opts,headers:{...(opts.headers||{}),Authorization:'Bearer '+token}});
+  if(r.status===401){token=null;throw new Error('TOKEN');}
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r;
+}
+async function findOrCreateFolder(){
+  if(DRIVE.folderId)return DRIVE.folderId;
+  const q=encodeURIComponent(`name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+  const found=await (await apiFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`)).json();
+  if(found.files&&found.files.length){DRIVE.folderId=found.files[0].id;}
+  else{
+    const created=await (await apiFetch('https://www.googleapis.com/drive/v3/files?fields=id',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:FOLDER_NAME,mimeType:'application/vnd.google-apps.folder'})
+    })).json();
+    DRIVE.folderId=created.id;
+  }
+  saveDrive();
+  return DRIVE.folderId;
+}
+async function uploadPhoto(id){
+  const folderId=await findOrCreateFolder();
+  const blob=await (await fetch(PHOTO[id])).blob();
+  const boundary='jurnal'+uid();
+  const meta={name:id+'.jpg',parents:[folderId]};
+  const body=new Blob([
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${boundary}\r\nContent-Type: image/jpeg\r\n\r\n`,
+    blob,
+    `\r\n--${boundary}--`
+  ]);
+  const r=await apiFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{
+    method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body
+  });
+  const j=await r.json();
+  DRIVE.files[id]=j.id;
+}
+async function processQueue(){
+  if(uploading||!driveConnected()||!navigator.onLine)return updateDriveBar();
+  uploading=true;
+  try{
+    while(DRIVE.pending.length){
+      const id=DRIVE.pending[0];
+      if(!PHOTO[id]||DRIVE.files[id]){DRIVE.pending.shift();saveDrive();continue;}
+      await uploadPhoto(id);
+      DRIVE.pending.shift();saveDrive();
+      updateDriveBar();
+    }
+  }catch(e){
+    // gagal: akan dicoba lagi otomatis
+  }finally{
+    uploading=false;
+    updateDriveBar();
+  }
+}
+function queueUpload(id){
+  if(DRIVE.files[id]||DRIVE.pending.includes(id))return;
+  DRIVE.pending.push(id);saveDrive();
+  processQueue();
+}
+// Mengambil foto yang hilang di perangkat dari Drive (berguna saat pindah perangkat)
+async function restoreFromDrive(){
+  if(!driveConnected())return alert('Hubungkan Google Drive terlebih dahulu.');
+  try{
+    const folderId=await findOrCreateFolder();
+    const list=await (await apiFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${folderId}' in parents and trashed=false`)}&fields=files(id,name)&pageSize=1000`)).json();
+    const byName={};
+    (list.files||[]).forEach(f=>byName[f.name.replace(/\.jpg$/,'')]=f.id);
+    let n=0;
+    for(const id of allPhotoIds()){
+      if(PHOTO[id]||!byName[id])continue;
+      const blob=await (await apiFetch(`https://www.googleapis.com/drive/v3/files/${byName[id]}?alt=media`)).blob();
+      const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(blob);});
+      PHOTO[id]=dataUrl;DRIVE.files[id]=byName[id];
+      await idbWrite(st=>st.put(dataUrl,id));
+      n++;
+    }
+    saveDrive();
+    alert(n?`${n} foto berhasil dipulihkan dari Google Drive.`:'Tidak ada foto yang perlu dipulihkan.');
+    render();
+  }catch(e){alert('Gagal memulihkan dari Drive. Coba hubungkan ulang.');}
+}
+function driveStatus(id){
+  if(DRIVE.files[id])return '<span class="ok">☁️ tersimpan di Drive</span>';
+  if(DRIVE.pending.includes(id))return '<span class="wait">⏳ menunggu unggah</span>';
+  return '';
+}
+function driveBarHtml(){
+  const up=Object.keys(DRIVE.files).length;
+  const wait=DRIVE.pending.length;
+  if(!driveConnected()){
+    return `<div class="drive"><strong>Google Drive belum terhubung.</strong>
+      <div class="muted">Foto tetap tersimpan di perangkat. Hubungkan untuk menyimpan salinan ke Drive.</div>
+      <button class="primary" onclick="connectDrive()">Hubungkan Google Drive</button></div>`;
+  }
+  return `<div class="drive"><span class="ok">● Terhubung ke Google Drive</span>
+    <div class="muted">${up} foto tersimpan di Drive · ${wait} menunggu unggah${uploading?' (sedang mengunggah...)':''}</div>
+    <div class="bar"><button class="ghost" onclick="processQueue()">Unggah yang tertunda</button>
+    <button class="ghost" onclick="restoreFromDrive()">Pulihkan dari Drive</button></div></div>`;
+}
+function updateDriveBar(){
+  const el=$('driveBar');
+  if(el)el.innerHTML=driveBarHtml();
+}
+
+/* ---------- STATE UI ---------- */
+let ui={view:'home',childId:null,tab:'catatan',draft:null,pendingPhotos:[],lb:null};
+
+function go(view,childId){
+  ui.view=view;
+  if(childId!==undefined)ui.childId=childId;
+  ui.pendingPhotos=[];
+  render();
+  window.scrollTo(0,0);
+}
+function childById(id){return S.children.find(c=>c.id===id);}
+function childName(id){const c=childById(id);return c?c.name:'';}
+function render(){
+  const app=$('app');
+  if(ui.view==='setup')app.innerHTML=viewSetup();
+  else if(ui.view==='child')app.innerHTML=viewChild();
+  else app.innerHTML=viewHome();
+  if(ui.lb)app.insertAdjacentHTML('beforeend',viewLightbox());
+}
+
+/* ---------- SETUP ---------- */
+function openSetup(){
+  ui.draft={
+    ayah:S.parent.ayah,ibu:S.parent.ibu,role:S.role,
+    children:S.children.map(c=>({...c}))
+  };
+  if(!ui.draft.children.length)ui.draft.children.push({id:null,name:'',gender:'',birth:''});
+  ui.view='setup';render();window.scrollTo(0,0);
+}
+function syncDraftTop(){
+  const a=$('ayah');if(!a)return;
+  ui.draft.ayah=a.value;ui.draft.ibu=$('ibu').value;ui.draft.role=$('role').value;
+}
+function addDraftChild(){syncDraftTop();ui.draft.children.push({id:null,name:'',gender:'',birth:''});render();}
+function removeDraftChild(i){syncDraftTop();ui.draft.children.splice(i,1);render();}
+function viewSetup(){
+  const d=ui.draft;
+  return `<div class="card">
+    <h1>${S.children.length?'Ubah Data Keluarga':'Selamat datang 🌱'}</h1>
+    <p class="muted">Isi data keluarga sekali saja. Data teks tersimpan di perangkat ini, dan foto disalin ke Google Drive bila terhubung.</p>
+    <label>Nama Ayah</label><input id="ayah" value="${esc(d.ayah)}">
+    <label>Nama Ibu</label><input id="ibu" value="${esc(d.ibu)}">
+    <label>Yang membuka aplikasi ini</label>
+    <select id="role"><option value="ayah" ${d.role==='ayah'?'selected':''}>Ayah</option><option value="ibu" ${d.role==='ibu'?'selected':''}>Ibu</option></select>
+    <h3>Anak-anak</h3>
+    ${d.children.map((c,i)=>`<div class="childRow">
+      <input placeholder="Nama anak" value="${esc(c.name)}" oninput="ui.draft.children[${i}].name=this.value">
+      <select onchange="ui.draft.children[${i}].gender=this.value">
+        <option value="">Gender</option>
+        <option value="Laki-laki" ${c.gender==='Laki-laki'?'selected':''}>Laki-laki</option>
+        <option value="Perempuan" ${c.gender==='Perempuan'?'selected':''}>Perempuan</option>
+      </select>
+      <input type="date" value="${esc(c.birth)}" onchange="ui.draft.children[${i}].birth=this.value">
+      <button class="x" onclick="removeDraftChild(${i})">Hapus</button>
+    </div>`).join('')}
+    <button class="ghost" onclick="addDraftChild()">+ Tambah anak</button>
+    <button class="primary" onclick="saveSetup()">Simpan & Lanjut</button>
+    ${S.children.length?'<button class="ghost" onclick="go(\'home\')">Batal</button>':''}
+  </div>`;
+}
+async function saveSetup(){
+  syncDraftTop();
+  const d=ui.draft;
+  if(!d.ayah.trim()&&!d.ibu.trim())return alert('Isi nama ayah atau ibu.');
+  const kids=d.children.filter(c=>c.name.trim());
+  if(!kids.length)return alert('Tambahkan minimal satu anak.');
+  if(kids.some(c=>!c.birth))return alert('Isi tanggal lahir setiap anak.');
+  const newKids=kids.map(c=>({id:c.id||uid(),name:c.name.trim(),gender:c.gender||'-',birth:c.birth}));
+  const removed=S.children.filter(c=>!newKids.find(n=>n.id===c.id));
+  if(removed.length&&!confirm('Anak yang dihapus dari daftar akan kehilangan catatan dan fotonya di perangkat ini (salinan di Drive tetap ada). Lanjutkan?'))return;
+  for(const r of removed){
+    const photoIds=[];
+    S.entries.filter(e=>e.childId===r.id).forEach(e=>photoIds.push(...e.photos));
+    Object.values(S.monthly[r.id]||{}).forEach(p=>photoIds.push(p.photo));
+    await removePhotos(photoIds);
+    S.entries=S.entries.filter(e=>e.childId!==r.id);
+    S.growth=S.growth.filter(g=>g.childId!==r.id);
+    delete S.milestones[r.id];
+    delete S.monthly[r.id];
+  }
+  S.parent={ayah:d.ayah.trim(),ibu:d.ibu.trim()};
+  S.role=d.role;
+  S.children=newKids;
+  save();go('home');
+}
+
+/* ---------- HOME ---------- */
+function pickMemory(){
+  const now=new Date(),mmdd=toISO(now).slice(5),yyyy=now.getFullYear();
+  const past=S.entries.filter(e=>e.date.slice(5)===mmdd&&+e.date.slice(0,4)<yyyy);
+  if(past.length){const e=pick(past);return {e,title:(yyyy-+e.date.slice(0,4))+' tahun yang lalu hari ini'};}
+  const withPhoto=S.entries.filter(e=>e.photos.length);
+  if(withPhoto.length){const e=pick(withPhoto);return {e,title:'Kenangan dari '+fmtDate(e.date)};}
+  if(S.entries.length){const e=pick(S.entries);return {e,title:'Kenangan dari '+fmtDate(e.date)};}
+  return null;
+}
+function viewHome(){
+  const who=S.role==='ayah'?'Ayah':'Ibu';
+  const name=S.parent[S.role]||'';
+  const mem=pickMemory();
+  const dayIdx=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/86400000);
+  const quote=QUOTES[dayIdx%QUOTES.length];
+  const memHtml=mem?`<div class="card memory">
+      <div class="muted">✨ ${esc(mem.title)} · ${esc(childName(mem.e.childId))}</div>
+      ${mem.e.photos.length?`<img src="${src(mem.e.photos[0])}" alt="">`:''}
+      <p>${esc(mem.e.text).replace(/\n/g,'<br>')}</p>
+    </div>`:'';
+  return `
+  <div class="card hero">
+    <div class="sapa">${greet()}, ${who} ${esc(name)} 🌙</div>
+    <div class="quote">“${esc(quote)}”</div>
+  </div>
+  <div class="card" id="driveBar">${driveBarHtml()}</div>
+  ${memHtml}
+  <h2>Si Kecil Kita</h2>
+  ${S.children.length?`<div class="grid">${S.children.map(c=>`
+    <div class="card kid" onclick="go('child','${c.id}')">
+      <div class="avatar">${esc(c.name.charAt(0).toUpperCase())}</div>
+      <strong>${esc(c.name)}</strong>
+      <div class="muted">${esc(c.gender)} · ${ageText(c)}</div>
+      <div class="muted">${S.entries.filter(e=>e.childId===c.id).length} kenangan</div>
+    </div>`).join('')}</div>`:'<p class="muted">Belum ada anak terdaftar.</p>'}
+  <div class="bar noprint">
+    <button class="ghost" onclick="openSetup()">Ubah keluarga / tambah anak</button>
+    <button class="ghost" onclick="exportData()">Unduh cadangan</button>
+    <button class="ghost" onclick="$('importFile').click()">Pulihkan cadangan</button>
+    <button class="ghost" onclick="window.print()">Cetak</button>
+  </div>`;
+}
+async function exportData(){
+  const photos=await idbAll();
+  const blob=new Blob([JSON.stringify({app:'jurnal-anak',version:3,state:S,drive:DRIVE,photos})],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='jurnal-anak-'+toISO(new Date())+'.json';a.click();
+}
+async function importData(file){
+  if(!file)return;
+  let d;
+  try{d=JSON.parse(await file.text());}catch(e){return alert('File cadangan tidak valid.');}
+  if(!confirm('Pulihkan cadangan akan menggantikan semua data di perangkat ini. Lanjutkan?'))return;
+  const isNew=d&&d.state&&(d.version===2||d.version===3);
+  const newState=normalize(isNew?d.state:d);
+  await idbWrite(st=>st.clear());
+  for(const k of Object.keys(PHOTO))delete PHOTO[k];
+  if(isNew){
+    for(const [id,data] of Object.entries(d.photos||{})){
+      PHOTO[id]=data;
+      await idbWrite(st=>st.put(data,id));
+    }
+    if(d.drive){DRIVE=Object.assign({folderId:null,files:{},pending:[]},d.drive);}
+  }
+  S=newState;
+  await migrate();
+  saveDrive();save();go('home');
+}
+
+/* ---------- CHILD ---------- */
+function viewChild(){
+  const c=childById(ui.childId);
+  if(!c)return viewHome();
+  const tabs=[['catatan','📝 Catatan'],['foto','📷 Foto'],['tonggak','🌟 Tonggak'],['tumbuh','📏 Tumbuh'],['kenangan','💛 Kenangan']];
+  const bodies={catatan:tabCatatan,foto:tabFoto,tonggak:tabTonggak,tumbuh:tabTumbuh,kenangan:tabKenangan};
+  const body=(bodies[ui.tab]||tabCatatan)(c);
+  return `
+  <button class="back noprint" onclick="go('home')">← Kembali</button>
+  <div class="card hero">
+    <div class="avatar">${esc(c.name.charAt(0).toUpperCase())}</div>
+    <h1>${esc(c.name)}</h1>
+    <div class="muted">${esc(c.gender)} · lahir ${fmtDate(c.birth)} · usia ${ageText(c)}</div>
+  </div>
+  <div class="tabs noprint">${tabs.map(t=>`<button class="tab ${ui.tab===t[0]?'on':''}" onclick="setTab('${t[0]}')">${t[1]}</button>`).join('')}</div>
+  ${body}`;
+}
+function setTab(t){ui.tab=t;ui.pendingPhotos=[];render();window.scrollTo(0,0);}
+
+/* ---------- CATATAN ---------- */
+function tabCatatan(c){
+  const list=S.entries.filter(e=>e.childId===c.id).sort((a,b)=>b.date.localeCompare(a.date));
+  return `<div class="card noprint">
+      <h3>Catatan baru</h3>
+      <label>Tanggal</label><input type="date" id="cDate" value="${toISO(new Date())}">
+      <textarea id="cText" placeholder="Hari ini ${esc(c.name)} ..."></textarea>
+      <label class="check"><input type="checkbox" id="cSurat"> Tulis sebagai surat untuk masa depan</label>
+      <label>Foto (boleh lebih dari satu, maks ${MAX_PHOTOS})</label>
+      <input type="file" accept="image/*" multiple id="fotoInput">
+      <div id="fotoPrev"></div>
+      <button class="primary" onclick="saveEntry('${c.id}')">Simpan kenangan</button>
+    </div>
+    <div class="card">${list.map(entryHtml).join('')||'<p class="muted">Belum ada catatan. Mulailah dari hal kecil hari ini.</p>'}</div>`;
+}
+function entryHtml(e){
+  return `<div class="entry ${e.type==='surat'?'letter':''}">
+    <div class="meta"><span>${fmtDate(e.date)} · ${e.type==='surat'?'✉️ Surat untuk masa depan':'📝 Catatan'}</span>
+    <button class="x noprint" onclick="delEntry('${e.id}')">Hapus</button></div>
+    ${e.photos.length?`<div class="pgrid">${e.photos.map((p,i)=>`<img src="${src(p)}" alt="" onclick="openLb('${e.id}',${i})">`).join('')}</div>`:''}
+    ${e.text?`<p>${esc(e.text)}</p>`:''}
+  </div>`;
+}
+async function saveEntry(cid){
+  const text=$('cText').value.trim();
+  if(!text&&!ui.pendingPhotos.length)return alert('Tulis sesuatu atau tambahkan foto.');
+  const ids=[];
+  for(const p of ui.pendingPhotos)ids.push(await addPhoto(p));
+  S.entries.push({id:uid(),childId:cid,date:$('cDate').value||toISO(new Date()),text,photos:ids,type:$('cSurat').checked?'surat':'catatan'});
+  ui.pendingPhotos=[];save();render();
+}
+async function delEntry(id){
+  if(!confirm('Hapus kenangan ini beserta fotonya di perangkat? Salinan di Drive tidak ikut dihapus.'))return;
+  const e=S.entries.find(x=>x.id===id);
+  if(e)await removePhotos(e.photos);
+  S.entries=S.entries.filter(x=>x.id!==id);save();render();
+}
+
+/* ---------- FOTO ---------- */
+function tabFoto(c){
+  return tabBulanan(c)+tabFotoBiasa(c);
+}
+function tabBulanan(c){
+  const age=ageMonths(c);
+  const slots=S.monthly[c.id]||{};
+  const months=age>=0?age:-1;
+  const filled=Object.keys(slots).length;
+  let grid='';
+  for(let m=0;m<=months;m++){
+    const p=slots[m];
+    grid+=`<div class="mslot">
+      <div class="mhead">Bulan ke-${m}</div>
+      ${p?`<img src="${src(p.photo)}" alt="" onclick="openLbMonthly('${c.id}',${m})">
+        <div class="cap">${fmtDate(p.date)}<br>${driveStatus(p.photo)}</div>
+        <button class="x noprint" onclick="delMonthly('${c.id}',${m})">Hapus</button>`
+        :`<label class="mempty noprint">+ Tambah foto<input type="file" accept="image/*" data-monthly="${c.id}|${m}"></label>`}
+    </div>`;
+  }
+  return `<div class="card">
+      <h3>Foto Perkembangan Bulanan</h3>
+      <p class="muted">Satu foto untuk setiap bulan usia ${esc(c.name)}. Sudah terisi ${filled} dari ${months+1} bulan.</p>
+      ${months>=0?`<div class="gallery">${grid}</div>`:'<p class="muted">Foto bulanan akan tersedia setelah tanggal lahir terisi.</p>'}
+    </div>`;
+}
+async function uploadMonthly(cid,m,file){
+  if(!file||!file.type.startsWith('image/'))return;
+  const data=await compress(file);
+  const old=(S.monthly[cid]||{})[m];
+  if(old)await removePhotos([old.photo]);
+  const id=await addPhoto(data);
+  S.monthly[cid]=S.monthly[cid]||{};
+  S.monthly[cid][m]={photo:id,date:toISO(new Date())};
+  save();render();
+}
+async function delMonthly(cid,m){
+  if(!confirm('Hapus foto bulan ke-'+m+' di perangkat ini?'))return;
+  const p=S.monthly[cid][m];
+  if(p)await removePhotos([p.photo]);
+  delete S.monthly[cid][m];save();render();
+}
+function openLbMonthly(cid,m){
+  const p=(S.monthly[cid]||{})[m];
+  if(!p)return;
+  ui.lb={photos:[p.photo],i:0,date:p.date,text:'Bulan ke-'+m,child:childName(cid)};
+  render();
+}
+function tabFotoBiasa(c){
+  const entries=S.entries.filter(e=>e.childId===c.id&&e.photos.length).sort((a,b)=>b.date.localeCompare(a.date));
+  const all=[];
+  entries.forEach(e=>e.photos.forEach((p,i)=>all.push({id:p,entryId:e.id,i,date:e.date})));
+  return `<div class="card noprint">
+      <h3>Tambah foto</h3>
+      <label>Tanggal</label><input type="date" id="cDate" value="${toISO(new Date())}">
+      <label>Keterangan (opsional)</label><input id="cText" placeholder="Misal: main pasir di pantai">
+      <input type="file" accept="image/*" multiple id="fotoInput">
+      <div id="fotoPrev"></div>
+      <button class="primary" onclick="saveFotoOnly('${c.id}')">Simpan foto</button>
+    </div>
+    <div class="card">
+      <h3>Galeri ${esc(c.name)} · ${all.length} foto</h3>
+      ${all.length?`<div class="gallery">${all.map(p=>`<div><img src="${src(p.id)}" alt="" onclick="openLb('${p.entryId}',${p.i})"><div class="cap">${fmtDate(p.date)}<br>${driveStatus(p.id)}</div></div>`).join('')}</div>`
+        :'<p class="muted">Belum ada foto. Foto yang ditambahkan akan muncul di sini.</p>'}
+    </div>`;
+}
+async function saveFotoOnly(cid){
+  if(!ui.pendingPhotos.length)return alert('Pilih foto terlebih dahulu.');
+  const ids=[];
+  for(const p of ui.pendingPhotos)ids.push(await addPhoto(p));
+  S.entries.push({id:uid(),childId:cid,date:$('cDate').value||toISO(new Date()),text:$('cText').value.trim(),photos:ids,type:'catatan'});
+  ui.pendingPhotos=[];save();render();
+}
+
+document.addEventListener('change',e=>{
+  if(e.target.id==='fotoInput')readPhotos(e.target.files);
+  if(e.target.id==='importFile')importData(e.target.files[0]);
+  if(e.target.dataset&&e.target.dataset.monthly){
+    const [cid,m]=e.target.dataset.monthly.split('|');
+    uploadMonthly(cid,+m,e.target.files[0]);
+  }
+});
+function compress(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=reject;
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const max=1000,scale=Math.min(1,max/Math.max(img.width,img.height));
+        const cv=document.createElement('canvas');
+        cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
+        cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+        resolve(cv.toDataURL('image/jpeg',0.75));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function readPhotos(files){
+  const list=[...files].filter(f=>f.type.startsWith('image/'));
+  for(const f of list){
+    if(ui.pendingPhotos.length>=MAX_PHOTOS){alert('Maksimal '+MAX_PHOTOS+' foto per catatan.');break;}
+    ui.pendingPhotos.push(await compress(f));
+  }
+  $('fotoPrev').innerHTML=ui.pendingPhotos.map(p=>`<img src="${p}" alt="">`).join('');
+}
+
+/* ---------- LIGHTBOX ---------- */
+function openLb(entryId,i){
+  const e=S.entries.find(x=>x.id===entryId);
+  if(!e)return;
+  ui.lb={photos:e.photos,i,date:e.date,text:e.text,child:childName(e.childId)};
+  render();
+}
+function lbMove(d){
+  const n=ui.lb.photos.length;
+  ui.lb.i=(ui.lb.i+d+n)%n;render();
+}
+function closeLb(){ui.lb=null;render();}
+function viewLightbox(){
+  const l=ui.lb,n=l.photos.length;
+  return `<div class="lb" onclick="if(event.target===this)closeLb()">
+    <button class="nav close" onclick="closeLb()">✕</button>
+    ${n>1?`<button class="nav prev" onclick="lbMove(-1)">‹</button><button class="nav next" onclick="lbMove(1)">›</button>`:''}
+    <img src="${src(l.photos[l.i])}" alt="">
+    <div class="info">${esc(l.child)} · ${fmtDate(l.date)}${l.text?'<br>'+esc(l.text):''}${n>1?'<br>'+(l.i+1)+' / '+n:''}</div>
+  </div>`;
+}
+
+/* ---------- TONGGAK ---------- */
+function tabTonggak(c){
+  const age=ageMonths(c);
+  const done=S.milestones[c.id]||{};
+  return `<p class="muted">Centang saat si kecil sudah bisa melakukannya. Anak tumbuh dengan ritmenya sendiri, jadi ini hanya catatan kenangan.</p>`+
+  MILESTONES.map((g,gi)=>`<div class="card group">
+    <h3>${g.label} ${age>=g.from&&age<g.to+12?'<span class="badge">usia sekarang</span>':''}</h3>
+    ${g.items.map((t,ii)=>{
+      const key='m'+gi+'_'+ii,d=done[key];
+      return `<label class="check"><input type="checkbox" ${d?'checked':''} onchange="toggleMilestone('${c.id}','${key}')">
+        <span>${esc(t)}${d?` <small class="muted">· ${fmtDate(d)}</small>`:''}</span></label>`;
+    }).join('')}
+  </div>`).join('');
+}
+function toggleMilestone(cid,key){
+  S.milestones[cid]=S.milestones[cid]||{};
+  if(S.milestones[cid][key]){delete S.milestones[cid][key];}
+  else{
+    const v=prompt('Tanggal tercapai (YYYY-MM-DD)',toISO(new Date()));
+    if(!v)return render();
+    S.milestones[cid][key]=v;
+  }
+  save();render();
+}
+
+/* ---------- TUMBUH ---------- */
+function tabTumbuh(c){
+  const list=S.growth.filter(g=>g.childId===c.id).sort((a,b)=>a.date.localeCompare(b.date));
+  const wPts=list.filter(g=>g.weight).map(g=>({x:new Date(g.date).getTime(),y:+g.weight}));
+  const hPts=list.filter(g=>g.height).map(g=>({x:new Date(g.date).getTime(),y:+g.height}));
+  return `<div class="card noprint">
+    <h3>Catat pengukuran</h3>
+    <label>Tanggal</label><input type="date" id="gDate" value="${toISO(new Date())}">
+    <div class="row"><div><label>Berat (kg)</label><input type="number" step="0.1" id="gW"></div>
+    <div><label>Tinggi (cm)</label><input type="number" step="0.1" id="gH"></div></div>
+    <button class="primary" onclick="saveGrowth('${c.id}')">Simpan pengukuran</button>
+  </div>
+  <div class="card"><h3>Berat badan</h3>${lineChart(wPts,'kg','#d98b5f')}
+    <h3>Tinggi badan</h3>${lineChart(hPts,'cm','#6f9f86')}</div>
+  <div class="card"><h3>Riwayat</h3>
+    ${list.length?`<table><tr><th>Tanggal</th><th>Berat</th><th>Tinggi</th><th></th></tr>
+    ${list.slice().reverse().map(g=>`<tr><td>${fmtDate(g.date)}</td><td>${g.weight||'-'}</td><td>${g.height||'-'}</td>
+      <td><button class="x noprint" onclick="delGrowth('${g.id}')">Hapus</button></td></tr>`).join('')}</table>`:'<p class="muted">Belum ada data.</p>'}
+  </div>`;
+}
+function saveGrowth(cid){
+  const w=$('gW').value,h=$('gH').value;
+  if(!w&&!h)return alert('Isi berat atau tinggi.');
+  S.growth.push({id:uid(),childId:cid,date:$('gDate').value||toISO(new Date()),weight:w,height:h});
+  save();render();
+}
+function delGrowth(id){S.growth=S.growth.filter(g=>g.id!==id);save();render();}
+function lineChart(pts,unit,color){
+  if(!pts.length)return '<p class="muted">Belum ada data.</p>';
+  const W=320,H=160,P=30;
+  const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+  const x0=Math.min(...xs),x1=Math.max(...xs);
+  const y0=Math.min(...ys)*0.95,y1=Math.max(...ys)*1.05||1;
+  const X=x=>x1===x0?W/2:P+(x-x0)/(x1-x0)*(W-2*P);
+  const Y=y=>H-P-(y-y0)/((y1-y0)||1)*(H-2*P);
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="${pts.map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="${color}" stroke-width="2.5"/>
+    ${pts.map(p=>`<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="4" fill="${color}"/>
+      <text x="${X(p.x)}" y="${Y(p.y)-9}" text-anchor="middle" font-size="11" fill="#4a3b32">${p.y} ${unit}</text>`).join('')}
+  </svg>`;
+}
+
+/* ---------- KENANGAN ---------- */
+function tabKenangan(c){
+  const items=[];
+  S.entries.filter(e=>e.childId===c.id).forEach(e=>items.push({date:e.date,html:entryHtml(e),kind:'e'}));
+  const names=[];
+  MILESTONES.forEach((g,gi)=>g.items.forEach((t,ii)=>names.push({key:'m'+gi+'_'+ii,label:t})));
+  Object.entries(S.milestones[c.id]||{}).forEach(([k,d])=>{
+    const m=names.find(x=>x.key===k);
+    if(m)items.push({date:d,html:`<div class="tl">🌟 ${esc(m.label)}</div>`,kind:'t'});
+  });
+  items.sort((a,b)=>b.date.localeCompare(a.date));
+  let lastYear='',out='';
+  items.forEach(it=>{
+    const y=it.date.slice(0,4);
+    if(y!==lastYear){out+=`<div class="year">${y}</div>`;lastYear=y;}
+    out+=it.html;
+  });
+  const entryCount=items.filter(i=>i.kind==='e').length;
+  const tCount=items.filter(i=>i.kind==='t').length;
+  return `<div class="card hero">
+      <p>Ada <strong>${entryCount}</strong> kenangan dan <strong>${tCount}</strong> tonggak tercapai untuk ${esc(c.name)} sejauh ini.</p>
+      <div class="quote">Setiap halaman ini adalah jejak tumbuhnya ${esc(c.name)}, tersimpan untuk dibaca kembali kelak.</div>
+    </div>
+    <div class="card">${out||'<p class="muted">Kenangan akan muncul di sini seiring waktu.</p>'}</div>
+    <button class="ghost noprint" onclick="window.print()">Cetak kenangan</button>`;
+}
+
+/* ---------- START ---------- */
+window.addEventListener('online',processQueue);
+setInterval(processQueue,60000);
+async function boot(){
+  try{
+    DB=await openDB();
+    Object.assign(PHOTO,await idbAll());
+  }catch(e){
+    alert('Penyimpanan foto (IndexedDB) tidak tersedia di browser ini. Foto tidak bisa disimpan.');
+  }
+  loadDrive();
+  S=loadState();
+  await migrate();
+  if(await waitGoogle()){
+    initDriveClient();
+    silentConnect();
+  }
+  if(!S.children.length)openSetup();else go('home');
+}
+boot();
+</script>
+</body>
+</html>
