@@ -405,11 +405,15 @@ function go(view,childId){
   window.scrollTo(0,0);
 }
 function childById(id){return S.children.find(c=>c.id===id);}
-function childName(id){const c=childById(id);return c?c.name:'';}
+function childName(id){
+  if(id==='keluarga')return 'Keluarga';
+  const c=childById(id);return c?c.name:'';
+}
 function render(){
   const app=$('app');
   if(ui.view==='setup')app.innerHTML=viewSetup();
   else if(ui.view==='child')app.innerHTML=viewChild();
+  else if(ui.view==='keluarga')app.innerHTML=viewKeluarga();
   else app.innerHTML=viewHome();
   if(ui.lb)app.insertAdjacentHTML('beforeend',viewLightbox());
 }
@@ -519,6 +523,7 @@ function viewHome(){
   ${viewKenanganKeluarga()}
   <div class="bar noprint">
     <button class="ghost" onclick="openSetup()">Ubah keluarga / tambah anak</button>
+    <button class="ghost" onclick="go('keluarga')">📖 Jurnal Keluarga</button>
     <button class="ghost" onclick="exportData()">Unduh cadangan</button>
     <button class="ghost" onclick="$('importFile').click()">Pulihkan cadangan</button>
     <button class="ghost" onclick="toggleTheme()">${document.body.classList.contains('dark')?'☀️ Mode terang':'🌙 Mode gelap'}</button>
@@ -833,6 +838,28 @@ function tabKenangan(c){
     </div>
     <div class="card">${out||'<p class="muted">Kenangan akan muncul di sini seiring waktu.</p>'}</div>
     <button class="ghost noprint" onclick="window.print()">Cetak kenangan</button>`;
+}
+
+/* ---------- JURNAL KELUARGA ---------- */
+function viewKeluarga(){
+  const list=S.entries.filter(e=>e.childId==='keluarga').sort((a,b)=>b.date.localeCompare(a.date));
+  return `<button class="back noprint" onclick="go('home')">← Kembali</button>
+  <div class="card hero">
+    <div class="avatar">🏡</div>
+    <h1>Jurnal Keluarga</h1>
+    <div class="muted">Cerita bersama seluruh keluarga: liburan, makan bersama, hari istimewa, atau hal sederhana yang ingin diingat.</div>
+  </div>
+  <div class="card noprint">
+    <h3>Tulis cerita keluarga</h3>
+    <label>Tanggal</label><input type="date" id="cDate" value="${toISO(new Date())}">
+    <textarea id="cText" placeholder="Hari ini kami sekeluarga ..."></textarea>
+    <label class="check"><input type="checkbox" id="cSurat"> Tulis sebagai surat untuk masa depan</label>
+    <label>Foto (boleh lebih dari satu, maks ${MAX_PHOTOS})</label>
+    <input type="file" accept="image/*" multiple id="fotoInput">
+    <div id="fotoPrev"></div>
+    <button class="primary" onclick="saveEntry('keluarga')">Simpan jurnal keluarga</button>
+  </div>
+  <div class="card">${list.map(entryHtml).join('')||'<p class="muted">Belum ada jurnal keluarga. Mulai dengan cerita pertama.</p>'}</div>`;
 }
 
 /* ---------- KENANGAN KELUARGA (gabungan semua anak) ---------- */
