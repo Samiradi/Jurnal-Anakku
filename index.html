@@ -9,7 +9,7 @@
 :root{--bg:#fdf6ef;--card:#fffdf9;--ink:#4a3b32;--muted:#8a7a6e;--accent:#d98b5f;--accent2:#8fb8a0;--line:#eadfd3;--gold:#f2c46d}
 *{box-sizing:border-box}
 body{margin:0;font-family:Georgia,"Times New Roman",serif;background:linear-gradient(180deg,#fdf6ef,#f5e9dc);color:var(--ink);min-height:100vh;line-height:1.5}
-.app{max-width:640px;margin:0 auto;padding:16px 14px 80px}
+.app{max-width:640px;margin:0 auto;padding:16px 14px 80px;position:relative;z-index:1}
 h1{font-size:1.5rem;margin:.2rem 0 .4rem}
 h2{font-size:1.2rem;margin:.2rem 0 .6rem}
 h3{font-size:1rem;margin:.8rem 0 .4rem}
@@ -74,11 +74,42 @@ td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
 .lb .prev{left:8px}.lb .next{right:8px}
 .lb .close{position:absolute;top:10px;right:10px;transform:none;font-size:1.1rem}
 .lb .info{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#f7ecdf;font-size:.9rem;padding:0 16px}
+/* ---------- MODE GELAP & TATA SURYA ---------- */
+.space{display:none;position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+body.dark{color:var(--ink);background:radial-gradient(ellipse at top,#1b1f4a 0%,#0a0c22 60%,#05060f 100%);background-attachment:fixed;--ink:#eef0ff;--muted:#a9afd6;--card:rgba(22,24,58,.78);--line:#2e3366;--accent:#f0a875;--accent2:#7fd1b9;--gold:#ffd77a;transition:background .6s}
+body.dark .space{display:block}
+body.dark .card{backdrop-filter:blur(6px);box-shadow:0 0 24px rgba(120,140,255,.12)}
+body.dark .hero{background:linear-gradient(135deg,rgba(40,44,100,.85),rgba(20,22,60,.85))}
+body.dark input,body.dark textarea,body.dark select{background:#12143a;color:var(--ink);border-color:var(--line)}
+body.dark .ghost,body.dark .tab{background:#23285e;color:var(--ink)}
+body.dark .primary{background:linear-gradient(135deg,#e88d5c,#c96f9b)}
+body.dark .entry.letter{background:rgba(70,58,20,.35);border-color:#5a4a20}
+body.dark .mslot{background:rgba(20,22,60,.6)}
+body.dark .mempty{background:#1a1d48}
+body.dark .chart{background:rgba(20,22,60,.6)}
+body.dark .gallery img,body.dark .pgrid img,body.dark .mslot img{background:#1a1d48}
+body.dark .badge{background:#1f4a3a;color:#bff5dc}
+body.dark .drive .ok{color:#7fd1b9}
+body.dark .drive .wait{color:var(--gold)}
+body.dark .year,body.dark .mhead,body.dark .back{color:var(--gold)}
+body.dark .memory{border-left-color:var(--gold)}
+body.dark .tl{border-color:var(--line)}
+body.dark td,body.dark th{border-color:var(--line)}
+body.dark .lb{background:rgba(3,4,14,.95)}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);box-shadow:0 0 4px rgba(255,255,255,.7)}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1.25)}}
+.sys{position:absolute;top:120px;right:12%;width:0;height:0;opacity:.6}
+.sun{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6c4,#ffc857 55%,#ff9f43);box-shadow:0 0 40px rgba(255,190,80,.7)}
+.orbit{position:absolute;left:0;top:0;width:var(--r);height:var(--r);margin-left:calc(var(--r)/-2);margin-top:calc(var(--r)/-2);border-radius:50%;border:1px dashed rgba(200,210,255,.14);animation:spin var(--t) linear infinite}
+.planet{position:absolute;left:50%;top:0;width:var(--ps);height:var(--ps);margin-left:calc(var(--ps)/-2);margin-top:calc(var(--ps)/-2);border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.star,.orbit{animation:none}}
 @media print{.noprint{display:none!important}body{background:#fff}.card{box-shadow:none}}
 @media (max-width:420px){.grid{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
+<div class="space" id="space" aria-hidden="true"></div>
 <div class="app" id="app"><p class="muted" style="text-align:center;margin-top:40px">Memuat...</p></div>
 <input type="file" accept="application/json" id="importFile" style="display:none">
 
@@ -489,6 +520,7 @@ function viewHome(){
     <button class="ghost" onclick="openSetup()">Ubah keluarga / tambah anak</button>
     <button class="ghost" onclick="exportData()">Unduh cadangan</button>
     <button class="ghost" onclick="$('importFile').click()">Pulihkan cadangan</button>
+    <button class="ghost" onclick="toggleTheme()">${document.body.classList.contains('dark')?'☀️ Mode terang':'🌙 Mode gelap'}</button>
     <button class="ghost" onclick="window.print()">Cetak</button>
   </div>`;
 }
@@ -802,9 +834,38 @@ function tabKenangan(c){
     <button class="ghost noprint" onclick="window.print()">Cetak kenangan</button>`;
 }
 
+/* ---------- TEMA ---------- */
+const PLANETS=[
+ {r:90,s:6,t:30,c:'#c9b8a3'},
+ {r:130,s:9,t:45,c:'#f0d9a8'},
+ {r:175,s:10,t:60,c:'#5ba4e6'},
+ {r:220,s:8,t:90,c:'#e8775a'},
+ {r:270,s:16,t:130,c:'#e9c48b'}
+];
+function applyTheme(){
+  document.body.classList.toggle('dark',localStorage.getItem('jurnal-tema')==='gelap');
+}
+function toggleTheme(){
+  const gelap=!document.body.classList.contains('dark');
+  localStorage.setItem('jurnal-tema',gelap?'gelap':'terang');
+  applyTheme();render();
+}
+function buildSpace(){
+  const box=$('space');
+  if(box.childElementCount)return;
+  let html='';
+  for(let i=0;i<120;i++){
+    const s=(Math.random()*2+1).toFixed(1);
+    html+=`<span class="star" style="left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*100).toFixed(2)}%;width:${s}px;height:${s}px;--d:${(2+Math.random()*3).toFixed(1)}s;--dl:${(Math.random()*4).toFixed(1)}s"></span>`;
+  }
+  html+='<div class="sys"><div class="sun"></div>'+PLANETS.map(p=>`<div class="orbit" style="--r:${p.r*2}px;--t:${p.t}s"><div class="planet" style="--ps:${p.s}px;--c:${p.c}"></div></div>`).join('')+'</div>';
+  box.innerHTML=html;
+}
+
 /* ---------- START ---------- */
 window.addEventListener('online',processQueue);
 setInterval(processQueue,60000);
+
 async function boot(){
   try{
     DB=await openDB();
@@ -819,6 +880,8 @@ async function boot(){
     initDriveClient();
     silentConnect();
   }
+  applyTheme();
+  buildSpace();
   if(!S.children.length)openSetup();else go('home');
 }
 boot();
