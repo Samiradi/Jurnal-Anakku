@@ -56,6 +56,7 @@ button{font:inherit;border:none;border-radius:12px;padding:11px 16px;cursor:poin
 .mhead{font-weight:bold;color:var(--accent);margin-bottom:6px}
 .mempty{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:10px;background:#f7efe6;cursor:pointer;font-size:.9rem;text-align:center;padding:6px}
 .mempty input{display:none}
+.mdate{font-size:.8rem;padding:6px 8px;margin:6px 0;min-height:auto}
 .group{margin-bottom:12px}
 .badge{display:inline-block;background:#e4f1e8;color:#3f7a57;border-radius:20px;padding:2px 10px;font-size:.78rem;margin-left:6px}
 .chart{width:100%;height:auto;background:#fffaf4;border-radius:12px;margin:6px 0}
@@ -674,25 +675,38 @@ function tabBulanan(c){
     grid+=`<div class="mslot">
       <div class="mhead">Bulan ke-${m}</div>
       ${p?`<img src="${src(p.photo)}" alt="" onclick="openLbMonthly('${c.id}',${m})">
-        <div class="cap">${fmtDate(p.date)}<br>${driveStatus(p.photo)}</div>
+        <input type="date" class="mdate noprint" value="${p.date}" onchange="setMonthlyDate('${c.id}',${m},this.value)">
+        <div class="cap">${driveStatus(p.photo)}</div>
         <button class="x noprint" onclick="delMonthly('${c.id}',${m})">Hapus</button>`
-        :`<label class="mempty noprint">+ Tambah foto<input type="file" accept="image/*" data-monthly="${c.id}|${m}"></label>`}
+        :`<input type="date" class="mdate noprint" id="md_${c.id}_${m}" value="${toISO(monthDate(c,m))}">
+        <label class="mempty noprint">+ Tambah foto<input type="file" accept="image/*" data-monthly="${c.id}|${m}"></label>`}
     </div>`;
   }
   return `<div class="card">
       <h3>Foto Perkembangan Bulanan</h3>
       <p class="muted">Satu foto untuk setiap bulan usia ${esc(c.name)}. Sudah terisi ${filled} dari ${months+1} bulan.</p>
+      <p class="muted" style="font-size:.85rem">Tanggal bawaan adalah tanggal yang sesuai dengan bulan tersebut sejak lahir. Anda bisa mengubahnya sebelum atau sesudah mengunggah, sehingga foto lama bisa ditempatkan dengan tanggal aslinya.</p>
       ${months>=0?`<div class="gallery">${grid}</div>`:'<p class="muted">Foto bulanan akan tersedia setelah tanggal lahir terisi.</p>'}
     </div>`;
 }
-async function uploadMonthly(cid,m,file){
+function monthDate(c,m){
+  const d=birthDate(c);
+  d.setMonth(d.getMonth()+m);
+  return d;
+}
+async function uploadMonthly(cid,m,file,date){
   if(!file||!file.type.startsWith('image/'))return;
   const data=await compress(file);
   const old=(S.monthly[cid]||{})[m];
   if(old)await removePhotos([old.photo]);
   const id=await addPhoto(data);
   S.monthly[cid]=S.monthly[cid]||{};
-  S.monthly[cid][m]={photo:id,date:toISO(new Date())};
+  S.monthly[cid][m]={photo:id,date:date||toISO(new Date())};
+  save();render();
+}
+function setMonthlyDate(cid,m,v){
+  if(!v||!(S.monthly[cid]&&S.monthly[cid][m]))return;
+  S.monthly[cid][m].date=v;
   save();render();
 }
 async function delMonthly(cid,m){
@@ -738,7 +752,8 @@ document.addEventListener('change',e=>{
   if(e.target.id==='importFile')importData(e.target.files[0]);
   if(e.target.dataset&&e.target.dataset.monthly){
     const [cid,m]=e.target.dataset.monthly.split('|');
-    uploadMonthly(cid,+m,e.target.files[0]);
+    const dEl=document.getElementById('md_'+cid+'_'+m);
+    uploadMonthly(cid,+m,e.target.files[0],dEl?dEl.value:null);
   }
 });
 function compress(file){
