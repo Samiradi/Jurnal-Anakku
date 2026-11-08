@@ -64,6 +64,10 @@ table{width:100%;border-collapse:collapse;font-size:.92rem}
 td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
 .year{font-size:1.1rem;color:var(--accent);margin:18px 0 6px;border-bottom:1px solid var(--line)}
 .tl{font-size:.92rem;padding:6px 0 6px 12px;border-left:2px solid var(--line);margin-left:6px}
+.kk-scroll{max-height:420px;overflow-y:auto;padding:0 8px 0 2px;overscroll-behavior:contain;scrollbar-width:thin}
+.kk-scroll .year{position:sticky;top:0;background:var(--card);z-index:1;padding-top:6px}
+@media (min-width:900px){.kk-scroll{max-height:520px}}
+.tgl{font-weight:bold;color:var(--accent);font-size:.9rem}
 .bar{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
 .back{background:none;color:var(--accent);padding:4px 0;min-height:auto}
 .drive{font-size:.92rem}
@@ -164,6 +168,7 @@ const MAX_PHOTOS=8;
 const CLIENT_ID='394889107563-j3cajoh1thpcffo1f3g7anv7g3f2oqqe.apps.googleusercontent.com';
 const DRIVE_SCOPE='https://www.googleapis.com/auth/drive.file';
 const FOLDER_NAME='Jurnal Anak';
+const BACKUP_NAME='jurnal-anak-cadangan.json';
 const QUOTES=[
  'Setiap hari bersama mereka adalah bab kecil yang tidak ingin kami lupakan.',
  'Tumbuhlah pelan-pelan, Nak. Kami akan selalu menjadi saksi langkahmu.',
@@ -222,7 +227,7 @@ function loadState(){
   catch(e){return emptyState();}
 }
 function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(S));}
+  try{localStorage.setItem(KEY,JSON.stringify(S));scheduleBackup();}
   catch(e){alert('Penyimpanan browser penuh. Unduh cadangan untuk berjaga-jaga.');}
 }
 function loadDrive(){
@@ -315,6 +320,7 @@ function initDriveClient(){
       localStorage.setItem(DRIVE_ON_KEY,'1');
       updateDriveBar();
       processQueue();
+      scheduleBackup();
     },
     error_callback:()=>{updateDriveBar();}
   });
@@ -395,6 +401,15 @@ async function restoreFromDrive(){
   if(!driveConnected())return alert('Hubungkan Google Drive terlebih dahulu.');
   try{
     const folderId=await findOrCreateFolder();
+    const bid=await findBackupId(folderId);
+    if(bid){
+      const data=await (await apiFetch(`https://www.googleapis.com/drive/v3/files/${bid}?alt=media`)).json();
+      const waktu=data.savedAt?new Date(data.savedAt).toLocaleString('id-ID'):'';
+      if(data.state&&confirm('Ditemukan cadangan teks di Drive'+(waktu?' (disimpan '+waktu+')':'')+'. Pulihkan teks kenangan dari cadangan ini?')){
+        S=normalize(data.state);
+        save();
+      }
+    }
     const list=await (await apiFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${folderId}' in parents and trashed=false`)}&fields=files(id,name)&pageSize=1000`)).json();
     const byName={};
     (list.files||[]).forEach(f=>byName[f.name.replace(/\.jpg$/,'')]=f.id);
@@ -427,12 +442,60 @@ function driveBarHtml(){
   }
   return `<div class="drive"><span class="ok">● Terhubung ke Google Drive</span>
     <div class="muted">${up} foto tersimpan di Drive · ${wait} menunggu unggah${uploading?' (sedang mengunggah...)':''}</div>
+    <div class="muted">Cadangan teks terakhir: ${lastBackup||'belum ada'}</div>
     <div class="bar"><button class="ghost" onclick="processQueue()">Unggah yang tertunda</button>
     <button class="ghost" onclick="restoreFromDrive()">Pulihkan dari Drive</button></div></div>`;
 }
 function updateDriveBar(){
   const el=$('driveBar');
   if(el)el.innerHTML=driveBarHtml();
+}
+
+/* ---------- CADANGAN OTOMATIS KE DRIVE ---------- */
+let backupTimer=null,backingUp=false;
+let lastBackup=localStorage.getItem('jurnal-backup-time')||'';
+function scheduleBackup(){
+  if(!driveConnected())return;
+  clearTimeout(backupTimer);
+  backupTimer=setTimeout(backupToDrive,4000);
+}
+async function findBackupId(folderId){
+  const q=encodeURIComponent(`name='${BACKUP_NAME}' and '${folderId}' in parents and trashed=false`);
+  const j=await (await apiFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`)).json();
+  return j.files&&j.files.length?j.files[0].id:null;
+}
+// Cadangan berisi teks dan daftar foto (bukan isi fotonya, karena foto sudah ada di Drive)
+async function backupToDrive(){
+  if(backingUp||!driveConnected()||!navigator.onLine)return;
+  backingUp=true;
+  try{
+    const folderId=await findOrCreateFolder();
+    const body=JSON.stringify({app:'jurnal-anak',version:3,savedAt:new Date().toISOString(),state:S,drive:{folderId:DRIVE.folderId,files:DRIVE.files}});
+    const existingId=await findBackupId(folderId);
+    if(existingId){
+      await apiFetch(`https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`,{
+        method:'PATCH',headers:{'Content-Type':'application/json'},body
+      });
+    }else{
+      const boundary='jurnal'+uid();
+      const meta={name:BACKUP_NAME,parents:[folderId]};
+      const multipart=new Blob([
+        `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n`,
+        body,
+        `\r\n--${boundary}--`
+      ]);
+      await apiFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{
+        method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body:multipart
+      });
+    }
+    lastBackup=new Date().toLocaleString('id-ID');
+    localStorage.setItem('jurnal-backup-time',lastBackup);
+  }catch(e){
+    // gagal: akan dicoba lagi saat ada perubahan berikutnya
+  }finally{
+    backingUp=false;
+    updateDriveBar();
+  }
 }
 
 /* ---------- STATE UI ---------- */
@@ -876,27 +939,21 @@ function lineChart(pts,unit,color){
 /* ---------- KENANGAN ---------- */
 function tabKenangan(c){
   const items=[];
-  S.entries.filter(e=>e.childId===c.id).forEach(e=>items.push({date:e.date,html:entryHtml(e),kind:'e'}));
+  S.entries.filter(e=>e.childId===c.id).forEach(e=>items.push({date:e.date,cid:c.id,eid:e.id,kind:e.type==='surat'?'surat':'catatan',text:e.text,photos:e.photos}));
   const names=[];
   MILESTONES.forEach((g,gi)=>g.items.forEach((t,ii)=>names.push({key:'m'+gi+'_'+ii,label:t})));
   Object.entries(S.milestones[c.id]||{}).forEach(([k,d])=>{
     const m=names.find(x=>x.key===k);
-    if(m)items.push({date:d,html:`<div class="tl">🌟 ${esc(m.label)}</div>`,kind:'t'});
+    if(m)items.push({date:d,cid:c.id,eid:null,kind:'tonggak',text:m.label,photos:[]});
   });
   items.sort((a,b)=>b.date.localeCompare(a.date));
-  let lastYear='',out='';
-  items.forEach(it=>{
-    const y=it.date.slice(0,4);
-    if(y!==lastYear){out+=`<div class="year">${y}</div>`;lastYear=y;}
-    out+=it.html;
-  });
-  const entryCount=items.filter(i=>i.kind==='e').length;
-  const tCount=items.filter(i=>i.kind==='t').length;
+  const entryCount=items.filter(i=>i.kind!=='tonggak').length;
+  const tCount=items.filter(i=>i.kind==='tonggak').length;
   return `<div class="card hero">
       <p>Ada <strong>${entryCount}</strong> kenangan dan <strong>${tCount}</strong> tonggak tercapai untuk ${esc(c.name)} sejauh ini.</p>
       <div class="quote">Setiap halaman ini adalah jejak tumbuhnya ${esc(c.name)}, tersimpan untuk dibaca kembali kelak.</div>
     </div>
-    <div class="card">${out||'<p class="muted">Kenangan akan muncul di sini seiring waktu.</p>'}</div>
+    ${kenanganBox('Kenangan '+c.name,items,false,c)}
     <button class="ghost noprint" onclick="window.print()">Cetak kenangan</button>`;
 }
 
@@ -922,6 +979,31 @@ function viewKeluarga(){
   <div class="card">${list.map(entryHtml).join('')||'<p class="muted">Belum ada jurnal keluarga. Mulai dengan cerita pertama.</p>'}</div>`;
 }
 
+/* ---------- KOTAK KENANGAN (dipakai untuk keluarga dan per anak) ---------- */
+function kenanganBox(title,items,showChild,child){
+  if(!items.length)return `<div class="card"><h2>${esc(title)}</h2><p class="muted">Kenangan akan muncul di sini seiring waktu.</p></div>`;
+  let lastMonth='',out='';
+  items.forEach(it=>{
+    const [y,mo]=it.date.split('-');
+    const key=y+'-'+mo;
+    if(key!==lastMonth){
+      const label=new Date(+y,+mo-1,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+      out+=`<div class="year">${esc(label)}</div>`;
+      lastMonth=key;
+    }
+    const day=new Date(it.date+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const icon=it.kind==='tonggak'?'🌟':it.kind==='surat'?'✉️':'📝';
+    let age='';
+    if(child){const m=monthsBetween(birthDate(child),new Date(it.date+'T00:00:00'));if(m>=0)age=` · usia ${m} bulan`;}
+    const who=showChild?`<strong>${esc(childName(it.cid))}</strong> · `:'';
+    const thumbs=it.photos.length?`<div class="pgrid">${it.photos.slice(0,4).map((p,i)=>`<img src="${src(p)}" alt="" onclick="openLb('${it.eid}',${i})">`).join('')}</div>`:'';
+    out+=`<div class="tl">${who}<span class="tgl">${esc(day)}${age}</span><br>${icon} ${esc(it.text).replace(/\n/g,'<br>')}${thumbs}</div>`;
+  });
+  return `<div class="card"><h2>${esc(title)}</h2>
+    <p class="muted" style="font-size:.85rem;margin-top:-4px">${items.length} kenangan · gulir untuk melihat semua</p>
+    <div class="kk-scroll">${out}</div></div>`;
+}
+
 /* ---------- KENANGAN KELUARGA (gabungan semua anak) ---------- */
 function viewKenanganKeluarga(){
   if(!S.children.length)return '';
@@ -935,17 +1017,7 @@ function viewKenanganKeluarga(){
   }));
   items.sort((a,b)=>b.date.localeCompare(a.date));
   if(!items.length)return `<div class="card"><h2>Kenangan Keluarga</h2><p class="muted">Kenangan dari semua anak akan terkumpul di sini.</p></div>`;
-  const shown=items.slice(0,30);
-  let lastYear='',out='';
-  shown.forEach(it=>{
-    const y=it.date.slice(0,4);
-    if(y!==lastYear){out+=`<div class="year">${y}</div>`;lastYear=y;}
-    const icon=it.kind==='tonggak'?'🌟':it.kind==='surat'?'✉️':'📝';
-    const thumbs=it.photos.length?`<div class="pgrid">${it.photos.slice(0,3).map((p,i)=>`<img src="${src(p)}" alt="" onclick="openLb('${it.eid}',${i})">`).join('')}</div>`:'';
-    out+=`<div class="tl"><strong>${esc(childName(it.cid))}</strong> · ${fmtDate(it.date)}<br>${icon} ${esc(it.text)}${thumbs}</div>`;
-  });
-  return `<div class="card"><h2>Kenangan Keluarga</h2>${out}
-    ${items.length>30?'<p class="muted">Menampilkan 30 kenangan terbaru. Buka tab Kenangan pada masing-masing anak untuk melihat semuanya.</p>':''}</div>`;
+  return kenanganBox('Kenangan Keluarga',items,true,null);
 }
 
 /* ---------- TEMA ---------- */
